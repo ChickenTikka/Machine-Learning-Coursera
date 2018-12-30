@@ -1,0 +1,33 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+
+df = pd.read_excel('amazon_baby.xlsx')
+
+selected_words = ['awesome', 'great', 'fantastic', 'amazing', 'love', 'horrible', 'bad', 'terrible', 'awful', 'wow', 'hate']
+
+def word_count(word):
+    result = []
+    for i in df.index:
+        result.append(str(df['review'][i]).count(word))
+    return result
+
+for word in selected_words:
+    df[word] = word_count(word)
+
+df = df[df['rating']!=3]
+df['sentiment'] = df['rating'] >= 4
+X = df[selected_words]
+y = df['sentiment']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 0, test_size = 0.2)
+clf = LogisticRegression(random_state= 0).fit(X_train, y_train)
+clf.predict(X_train)
+clf.score(X_test,y_test)clf.predict_proba(X)
+clf.coef_
+
+diaper_champ_reviews = df[df['name'] == 'Baby Trend Diaper Champ']
+X_diaper_champ_reviews = diaper_champ_reviews[selected_words]
+diaper_champ_reviews['predicted_sentiment'] = clf.predict_proba(X_diaper_champ_reviews)
+diaper_champ_reviews.sort_values(by = 'predicted_sentiment',ascending = False)
