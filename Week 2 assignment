@@ -1,0 +1,51 @@
+%matplotlib notebook
+import pandas as pd
+import numpy as np
+
+df = pd.read_csv('home_data.csv')
+
+#follow lecture here as it solved wrongly there. Below is correct implementation
+sl = df.groupby(['zipcode'])
+sl.head()
+ans = sl.agg('sum').sort_values(by = 'price', ascending = False)
+
+#Solution to Q2
+df[(df['sqft_living'] > 2000) & (df['sqft_living'] <= 4000)]
+
+advanced_features = [
+'bedrooms', 'bathrooms', 'sqft_living', 'sqft_lot', 'floors', 'zipcode',
+'condition', # condition of house				
+'grade', # measure of quality of construction				
+'waterfront', # waterfront property				
+'view', # type of view				
+'sqft_above', # square feet above ground				
+'sqft_basement', # square feet in basement				
+'yr_built', # the year built				
+'yr_renovated', # the year renovated				
+'lat', 'long', # the lat-long of the parcel				
+'sqft_living15', # average sq.ft. of 15 nearest neighbors 				
+'sqft_lot15', # average lot size of 15 nearest neighbors 
+]
+
+my_features = ['bedrooms', 'bathrooms', 'sqft_living', 'sqft_lot', 'floors', 'zipcode']
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+
+X_train, X_test, y_train, y_test = train_test_split(df[my_features], df['price'], random_state =0, test_size = 0.2)
+clf = LinearRegression().fit(X_train, y_train)
+result = []
+result = clf.predict(X_test)
+final_result = result - y_test
+RSS = np.sum(np.square(final_result))
+RMSE = np.sqrt(RSS / len(final_result))
+RMSE
+
+X_train_1, X_test_1, y_train_1, y_test_1 = train_test_split(df[advanced_features], df['price'], random_state =0, test_size = 0.2)
+clf1 = LinearRegression().fit(X_train_1, y_train_1)
+result1 = []
+result1 = clf1.predict(X_test_1)
+result1 -= y_test_1
+RSS1 = np.sum(np.square(result1))
+RMSE1 = np.sqrt(RSS1 / len(result1))
+RMSE1
